@@ -44,7 +44,7 @@ esac
 TARBALL="${ALPINE_URL##*/}"
 
 echo -e "${AQUA}= install some dependencies${NC}"
-sudo apt update -qy && sudo apt -y install wget curl strip
+sudo apt update -qy && sudo apt -y install wget curl binutils
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
