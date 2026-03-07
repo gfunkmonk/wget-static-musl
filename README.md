@@ -1,6 +1,6 @@
 # wget-static-musl
 
-This is a static version of wget build in musl with a very simple workflow.
-I just did because it's a very hard task to staticaly link this tool, if you give an ./wget --version you gonna see it's almost identical to the the version shipped by ubuntu or debian distros, it's a prove of concept.
-Just notice statically link in a software against musl is easier than use glibc.
-also notice depending the nunber of dependecies statically link a software can become impossible, the less dependencies it has more easier is to statically link.
+This is a static version of wget built with musl via a simple workflow.
+I built this because statically linking wget is a surprisingly hard task. If you run `./wget --version` you will see it is almost identical to the version shipped by Ubuntu or Debian — it is a proof of concept.
+Just note that statically linking against musl is easier than against glibc.
+Also note that the fewer dependencies a piece of software has, the easier it is to link statically; with a large number of dependencies, static linking can become impossible.
