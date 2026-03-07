@@ -28,7 +28,10 @@ jobs:
     - uses: actions/checkout@v4
     - name: build wget
       run: |
-        echo -e "\033[38;2;152;255;152m$PATH\033[0m"
+        PURPLE='\x1B[1;35m'
+        NC='\x1B[0m'
+
+        echo -e "${PURPLE}$PATH${NC}"
         chmod +x wget-static.sh
         ./wget-static.sh
       env:
