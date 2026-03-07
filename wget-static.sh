@@ -93,9 +93,9 @@ tar xf wget-1.25.0.tar.gz && \
 cd wget-1.25.0/ && \
 ./configure CC=gcc --with-ssl=openssl LDFLAGS='-static -lidn2 -lunistring' CFLAGS='-O3 -Wno-unterminated-string-initialization' PERL=/usr/bin/perl && \
 make -j\$(nproc) && \
-strip wget && \
-upx --ultra-brute wget"
+strip src/wget && \
+upx --ultra-brute src/wget"
 mkdir -p dist
-cp "./pasta/wget-1.25.0/src/wget" "dist/axel-${ARCH}"
+cp "./pasta/wget-1.25.0/src/wget" "dist/wget-${ARCH}"
 tar -C dist -cJf "dist/wget-${ARCH}.tar.xz" "wget-${ARCH}"
 echo -e "${LEMON}= All done!${NC}"
