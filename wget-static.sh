@@ -9,6 +9,7 @@ VIOLET="\033[38;2;143;0;255m"
 MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
+PEACH="\033[38;2;246;161;146m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -16,7 +17,18 @@ WGET_VERSION="1.25.0"
 ALPINE_VERSION="3.23.3"
 ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
-## map arch to QEMU binary name; Alpine minirootfs URL is derived from ARCH and version
+WGET_MIRRORS=(
+  "https://gnu.askapache.com/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://mirror.team-cymru.com/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://ftp.wayne.edu/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://mirror.us-midwest-1.nexcess.net/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://ftpmirror.gnu.org/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://mirrors.ibiblio.org/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://mirror.csclub.uwaterloo.ca/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://mirror.cyberbits.eu/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+  "https://ftp.fau.de/gnu/wget/wget-${WGET_VERSION}.tar.gz"
+)
+
 case "${ARCH}" in
   x86_64)  QEMU_ARCH="" ;;
   x86)     QEMU_ARCH="i386" ;;
@@ -44,15 +56,34 @@ DEBIAN_DEPS=(wget curl binutils)
 [ -n "${QEMU_ARCH}" ] && DEBIAN_DEPS+=(qemu-user-static)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
+echo -e "${AQUA}= downloading wget-${WGET_VERSION} tarball${NC}"
+WGET_TARBALL="wget-${WGET_VERSION}.tar.gz"
+WGET_DOWNLOADED=false
+for mirror in "${WGET_MIRRORS[@]}"; do
+  echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
+  if curl -fsSL --retry 3 --retry-delay 2 -o "${WGET_TARBALL}" "${mirror}"; then
+    echo -e "${MINT}= downloaded from: ${mirror}${NC}"
+    WGET_DOWNLOADED=true
+    break
+  else
+    echo -e "${LEMON}= failed: ${mirror}${NC}"
+    rm -f "${WGET_TARBALL}"
+  fi
+done
+if [ "${WGET_DOWNLOADED}" = false ]; then
+  echo -e "${TOMATO}= ERROR: all mirrors failed for wget-${WGET_VERSION}.tar.gz${NC}"
+  exit 1
+fi
+
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
 
 echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta
 tar xf "${TARBALL}" -C pasta/
-
-echo -e "${TOMATO}= copy resolv.conf into the folder${NC}"
+echo -e "${PEACH}= copy resolv.conf and wget tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
+cp "${WGET_TARBALL}" "./pasta/${WGET_TARBALL}"
 
 echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
@@ -84,7 +115,7 @@ libunistring-static \
 upx \
 patch \
 texinfo \
-perl && curl -fsSL -O 'https://mirrors.ibiblio.org/gnu/wget/wget-${WGET_VERSION}.tar.gz' && \
+perl && \
 curl -fsSL -O 'https://github.com/gfunkmonk/wget-static-musl/raw/refs/heads/main/wget-passive-ftp.patch' && \
 tar xf wget-${WGET_VERSION}.tar.gz && \
 cd wget-${WGET_VERSION}/ && \
