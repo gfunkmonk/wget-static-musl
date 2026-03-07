@@ -115,12 +115,14 @@ libunistring-static \
 upx \
 patch \
 texinfo \
+pcre2-dev \
+pcre2-static \
 perl && \
 curl -fsSL -O 'https://github.com/gfunkmonk/wget-static-musl/raw/refs/heads/main/wget-passive-ftp.patch' && \
 tar xf wget-${WGET_VERSION}.tar.gz && \
 cd wget-${WGET_VERSION}/ && \
 patch -p1 < ../wget-passive-ftp.patch && \
-./configure CC=gcc --with-ssl=openssl LDFLAGS='-static -lidn2 -lunistring' CFLAGS='-Os -Wno-unterminated-string-initialization' PERL=/usr/bin/perl && \
+./configure CC=gcc --with-ssl=openssl --with-libidn --disable-nls LDFLAGS='-static -lidn2 -lunistring' CFLAGS='-Os -Wno-unterminated-string-initialization' PERL=/usr/bin/perl && \
 make -j\$(nproc) && \
 strip src/wget && \
 upx --lzma src/wget"
